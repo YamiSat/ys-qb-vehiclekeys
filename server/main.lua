@@ -132,6 +132,7 @@ QBCore.Functions.CreateCallback('vehiclekeys:state', function(source, cb, plate)
         if Config.Debug then print("^5Debug^7: ^3vehiclekeys:state: true = LOCKED") end
     elseif state[plate] == nil then 
         result = 3
+        state[plate] = 2
         if Config.Debug then print("^5Debug^7: ^3vehiclekeys:state: nil = LOCKED") end
     else
         result = 1
@@ -148,17 +149,21 @@ RegisterNetEvent('qb-vehiclekeys:server:setVehLockState', function(vehNetId, sta
  if state[plate] then  
     if states == 2 then
        state[plate] = 2
+
        if Config.Debug then print("^5Debug^7: ^3vehiclekeys:state: LOCKED ") end
-    elseif states == 1 then
+     elseif states == 1 then
         state[plate] = 1
         if Config.Debug then print("^5Debug^7: ^3vehiclekeys:state: UNLOCKED ") end
-    else
-      state[plate] = 2
-    end
-else
-return
+     end
+  else
+ state[plate] = states
 end
 end)
+
+RegisterNetEvent('qb-vehiclekeys:server:RemoveKeys', function(plate)
+    RemoveKeys(source, plate)
+end)
+
 
 
 QBCore.Commands.Add("givekeys", Lang:t("addcom.givekeys"), {{
