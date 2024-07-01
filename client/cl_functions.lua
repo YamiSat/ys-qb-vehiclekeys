@@ -541,7 +541,7 @@ function LockpickFinishCallback(success)
 
     else
         TriggerServerEvent('hud:server:GainStress', math.random(1, 4))
-     policeAlert(GetEntityCoords(PlayerPedId())
+     policeAlert(GetEntityCoords(PlayerPedId()))
     end
 
     if usingAdvanced then
