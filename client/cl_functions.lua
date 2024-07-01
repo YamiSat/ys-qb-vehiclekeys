@@ -541,7 +541,7 @@ function LockpickFinishCallback(success)
 
     else
         TriggerServerEvent('hud:server:GainStress', math.random(1, 4))
-        AttemptPoliceAlert("steal", GetEntityCoords(PlayerPedId())
+     policeAlert(GetEntityCoords(PlayerPedId())
     end
 
     if usingAdvanced then
@@ -672,7 +672,7 @@ function CarjackVehicle(target)
                 end
                 isCarjacking = false
                 Wait(2000)
-                AttemptPoliceAlert("carjack", GetEntityCoords(PlayerPedId())
+                policeAlert(GetEntityCoords(PlayerPedId())
                 Wait(Config.DelayBetweenCarjackings)
                 canCarjack = true
             end
