@@ -1,49 +1,81 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
-function rcore_dispatch()
-    local vehicle = GetVehicleData() 
-    local text =
-        'Estan tratando de robar un vehiculo modelo %s pintado de color %s en mi posición. ¡Por favor, llamen a la policía!'
-    text = string.format(text, vehicle.model, vehicle.color)
-   print(vehicle.model)
-    local data = {
-        code = '10-64 - Car theft', -- string -> The alert code, can be for example '10-64' or a little bit longer sentence like '10-64 - Shop robbery'
-        default_priority = 'low', -- 'low' | 'medium' | 'high' -> The alert priority
-        coords = coords, -- vector3 -> The coords of the alert
-        job = 'police', -- string | table -> The job, for example 'police' or a table {'police', 'ambulance'}
-        text = text, -- string -> The alert text
-        type = 'car_robbery', -- alerts | shop_robbery | car_robbery | bank_robbery -> The alert type to track stats
-        blip_time = 5, -- number (optional) -> The time until the blip fades
-        --    image = image.attachments[1].proxy_url,
-        vehicle_colour =  vehicle.color,
-        vehicle_plate = vehicle.plate,
-        --     custom_sound = 'url_to_sound.mp3', -- string (optional) -> The url to the sound to play with the alert
-        blip = { -- Blip table (optional)
-            sprite = 225, -- number -> The blip sprite: Find them here (https://docs.fivem.net/docs/game-references/blips/#blips)
-            colour = 3, -- number -> The blip colour: Find them here (https://docs.fivem.net/docs/game-references/blips/#blip-colors)
-            scale = 0.7, -- number -> The blip scale
-            text = 'Robo de vehiculo', -- number (optional) -> The blip text
-            flashes = false, -- boolean (optional) -> Make the blip flash
-            radius = 0 -- number (optional) -> Create a radius blip instead of a normal one
-        }
-    }
-    TriggerServerEvent('rcore_dispatch:server:sendAlert', data)
+policeAlert = function(coords)
 
-end
-
-function origen_police()
-    local data = GetVehicleData() 
-    TriggerServerEvent("SendAlert:police", {
-        coords = data.coords,
-        title = 'Robo de vehiculo',
-        type = 'GENERAL',
-        message = 'Estan tratando de robar un vehiculo',
-        job = 'police',
-        metadata = {
-            model = data.model,
-            color = {data.R, data.G , data.B},
-            plate = data.plate,
-            unit = 'ADAM-10'
+    if Config.Dispatch  == "cd_dispatch" then
+        local data = exports['cd_dispatch']:GetPlayerInfo()
+        TriggerServerEvent('cd_dispatch:AddNotification', {
+            job_table = { police, sheriff }, 
+            coords = coords,
+            title = 'Vehicle Robbery',
+            message = 'A '..data.sex..' robbing a Vehicle at '..data.street, 
+            flash = 0,
+            unique_id = data.unique_id,
+            sound = 1,
+            blip = {
+                sprite = 431, 
+                scale = 1.2, 
+                colour = 3,
+                flashes = false, 
+                text = '911 - Vehicle Robbery',
+                time = 5,
+                radius = 0,
+            }
+        })
+    elseif Config.Dispatch == "qs-dispatch" then
+        local playerData = exports['qs-dispatch']:GetPlayerInfo()
+        TriggerServerEvent('qs-dispatch:server:CreateDispatchCall', {
+            job = { police, sheriff },
+            callLocation = coords,
+            message = " street_1: ".. playerData.street_1.. " street_2: ".. playerData.street_2.. " sex: ".. playerData.sex,
+            flashes = false,
+            image = image or nil,
+            blip = {
+                sprite = 431,
+                scale = 1.2,
+                colour = 3,
+                flashes = false,
+                text = 'Vehicle Robbery',
+                time = (20 * 1000),     --20 secs
+            }
+        })
+    elseif Config.Dispatch == "ps-dispatch" then
+        local dispatchData = {
+            message = "Vehicle Robbery",
+            codeName = 'vehicle',
+            code = '10-90',
+            icon = 'fas fa-store',
+            priority = 2,
+            coords = coords,
+            gender = IsPedMale(cache.ped) and 'Male' or 'Female',
+            street = "Vehicle",
+            camId = nil,
+            jobs = { police, sheriff },
         }
-    })
+        TriggerServerEvent('ps-dispatch:server:notify', dispatchData)
+    elseif Config.Dispatch  == "origen_police" then
+        local data = {
+            code = '10-64', 
+            default_priority = 'high', 
+            coords = coords, 
+            job = { police, sheriff }, 
+            text = 'Robo de Vehiculo', 
+            type = 'car_robbery', 
+            blip_time = 5, 
+            blip = {
+                sprite = 431, 
+                colour = 3, 
+                scale = 1.2, 
+                text = 'Robo de tienda', 
+                flashes = false, 
+                radius = 0, 
+            }
+        }
+        TriggerServerEvent("SendAlert:police", {
+            coords = GetEntityCoords(PlayerPedId()), -- Coordinates vector3(x, y, z) in which the alert is triggered
+            title = "10-96 Robo de Vehiculo", -- Title in the alert header
+            type = "ROBERY", -- Alert type (GENERAL, RADARS, 215, DRUGS, FORCE, 48X) This is to filter the alerts in the dashboard
+            message = "Una persona se encuentra tratando de robar un vehiculo ¡auxilio!", -- Alert message
+        }) 
+    end
 end
