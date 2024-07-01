@@ -181,6 +181,7 @@ RegisterNetEvent('vehiclekeys:startlockpick', function()
             end
         end
     end
+      policeAlert(GetEntityCoords(ped))
     ClearPedTasks(GetPlayerPed(-1))
 end)
 
