@@ -541,7 +541,7 @@ function LockpickFinishCallback(success)
 
     else
         TriggerServerEvent('hud:server:GainStress', math.random(1, 4))
-        AttemptPoliceAlert("steal")
+        AttemptPoliceAlert("steal", GetEntityCoords(PlayerPedId())
     end
 
     if usingAdvanced then
@@ -672,7 +672,7 @@ function CarjackVehicle(target)
                 end
                 isCarjacking = false
                 Wait(2000)
-                AttemptPoliceAlert("carjack")
+                AttemptPoliceAlert("carjack", GetEntityCoords(PlayerPedId())
                 Wait(Config.DelayBetweenCarjackings)
                 canCarjack = true
             end
@@ -684,7 +684,7 @@ function CarjackVehicle(target)
         end)
 end
 
-function AttemptPoliceAlert(type)
+function AttemptPoliceAlert(type, coords)
     if not AlertSend then
         local chance = Config.PoliceAlertChance
         if GetClockHours() >= 1 and GetClockHours() <= 6 then
@@ -692,12 +692,9 @@ function AttemptPoliceAlert(type)
         end
        if math.random() <= chance then
            if Config.Debug then print("^5Debug^7: ^3Shooting alert the police ^7") end
-            if Config.Dispatch == 'rcore' then
-                if Config.Debug then print("^5Debug^7: ^3Using RCORE Dispatch ^7") end
-                rcore_dispatch()
-            elseif Config.Dispatch == 'origen' then
-                if Config.Debug then print("^5Debug^7: ^3Using ORIGEN POLICE Dispatch ^7") end
-                origen_police()
+            if Config.Dispatch then
+                if Config.Debug then print("^5Debug^7: ^3Using Dispatch ^7") end
+               policeAlert(coords)
             end
         end
         AlertSend = true
