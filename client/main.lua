@@ -52,11 +52,11 @@ RegisterCommand('engine', function()
     end
 end)
 
-AddEventHandler('onResourceStart', function(resourceName)
-    if resourceName == GetCurrentResourceName() and QBCore.Functions.GetPlayerData() ~= {} then
-        GetKeys()
-    end
-end)
+-- AddEventHandler('onResourceStart', function(resourceName)
+--     if resourceName == GetCurrentResourceName() and QBCore.Functions.GetPlayerData() ~= {} then
+--         GetKeys()
+--     end
+-- end)
 
 -- Handles state right when the player selects their character and location.
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
@@ -83,7 +83,7 @@ RegisterNetEvent('qb-vehiclekeys:client:AddKeys', function(plate)
 end)
 
 RegisterNetEvent('qb-vehiclekeys:client:RemoveKeys', function(plate)
-
+ TriggerServerEvent('qb-vehiclekeys:server:RemoveKeys', plate)
 end)
 --[[
 RegisterNetEvent('qb-vehiclekeys:client:ToggleEngine', function()
@@ -168,7 +168,6 @@ RegisterNetEvent('vehiclekeys:startlockpick', function()
                 local success = exports['qb-minigames']:Lockpick(3) -- number of tries
                 if success then
                     print('success')
-                    SetVehicleDoorsLocked(closestVehicle, 1)
                  --   SetVehicleDoorsLockedForAllPlayers(closestVehicle, false)
                   TriggerServerEvent('qb-vehiclekeys:server:setVehLockState', NetworkGetNetworkIdFromEntity(closestVehicle), 1, QBCore.Functions.GetPlate(closestVehicle))
                     TriggerServerEvent('qb-vehiclekeys:server:breakLockpick', Config.lockpick)

@@ -20,15 +20,14 @@ function robKeyLoop()
         looped = true
 
         while true do
-            local sleep = 1000
+           sleep = 1000
             if LocalPlayer.state.isLoggedIn then
-                sleep = 100
-
+                
                 local ped = PlayerPedId()
                 local entering = GetVehiclePedIsTryingToEnter(ped)
                 local carIsImmune = false
                 if entering ~= 0 and not isBlacklistedVehicle(entering) then
-                    sleep = 2000
+                   
                     local plate = QBCore.Functions.GetPlate(entering)
 
                     local driver = GetPedInVehicleSeat(entering, -1)
@@ -94,14 +93,17 @@ function robKeyLoop()
                     elseif driver == 0 and not HasKeys(plate) and not isTakingKeys then
                         local result = state(plate)
                        if result == 2 then    
-                                       TriggerServerEvent('qb-vehiclekeys:server:setVehLockState',
-                                       NetworkGetNetworkIdFromEntity(entering), 2, QBCore.Functions.GetPlate(veh))
+                       SetVehicleDoorsLocked(entering, 2)
+                                    --    TriggerServerEvent('qb-vehiclekeys:server:setVehLockState',
+                                    --    NetworkGetNetworkIdFromEntity(entering), 2, QBCore.Functions.GetPlate(veh))
                        elseif result == 1 then   
-                        TriggerServerEvent('qb-vehiclekeys:server:setVehLockState',
-                        NetworkGetNetworkIdFromEntity(entering), 1, QBCore.Functions.GetPlate(veh))
+                        SetVehicleDoorsLocked(entering, 1)
+                        -- TriggerServerEvent('qb-vehiclekeys:server:setVehLockState',
+                        -- NetworkGetNetworkIdFromEntity(entering), 1, QBCore.Functions.GetPlate(veh))
                        elseif result == 3 then   
-                            TriggerServerEvent('qb-vehiclekeys:server:setVehLockState',
-                            NetworkGetNetworkIdFromEntity(entering), 2, QBCore.Functions.GetPlate(veh))
+                        SetVehicleDoorsLocked(entering, 2)
+                            -- TriggerServerEvent('qb-vehiclekeys:server:setVehLockState',
+                            -- NetworkGetNetworkIdFromEntity(entering), 2, QBCore.Functions.GetPlate(veh))
                         end
                     end
                 end
@@ -109,18 +111,16 @@ function robKeyLoop()
                 if IsPedInAnyVehicle(ped, false) and not IsHotwiring then
                     local vehicle = GetVehiclePedIsIn(ped)
                     local plate = QBCore.Functions.GetPlate(vehicle)
-
-                    if GetPedInVehicleSeat(vehicle, -1) == PlayerPedId() then
-                        if not HasKeys(plate) and not isBlacklistedVehicle(vehicle) then
+                    if not isBlacklistedVehicle(vehicle) then
+                        while not HasKeys(plate) and GetPedInVehicleSeat(vehicle, -1) == PlayerPedId() do
                             local vehiclePos = GetOffsetFromEntityInWorldCoords(vehicle, 0.0, 1.0, 0.5)
                             SetVehicleEngineOn(vehicle, false, false, true)
-
-                          --  if HotwiringCooldown == 0 then
-                            --    DrawText3D(vehiclePos.x, vehiclePos.y, vehiclePos.z, Lang:t("info.skeys"))
+                            Wait(1)
+                           --  DrawText3D(vehiclePos.x, vehiclePos.y, vehiclePos.z, Lang:t("info.skeys"))
                                 if IsControlJustPressed(0, 74) then
                                     Hotwire(vehicle, plate)
                                 end
-                         --   end
+            
                         end
                     end
                 end
@@ -672,7 +672,7 @@ function CarjackVehicle(target)
                 end
                 isCarjacking = false
                 Wait(2000)
-                policeAlert(GetEntityCoords(PlayerPedId())
+                policeAlert(GetEntityCoords(PlayerPedId()))
                 Wait(Config.DelayBetweenCarjackings)
                 canCarjack = true
             end
