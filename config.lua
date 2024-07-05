@@ -8,6 +8,7 @@ Config.LockNPCParkedCars = true -- Lock state for NPC parked cars [true = locked
 Config.UseKeyfob = false -- you can set this true if you dont need ui
 -- Lockpick Settings
 Config.lockpick = 'carlock'-- Item name
+Config.engineKey = 'G'
 
 -- Carjack Settings
 Config.CarJackEnable = true -- True allows for the ability to car jack peds.
