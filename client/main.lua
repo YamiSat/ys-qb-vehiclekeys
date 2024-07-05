@@ -44,13 +44,48 @@ RegisterNetEvent('vehiclekeys:start', function()
     end
 end)
 
-RegisterKeyMapping('engine', Lang:t("info.engine"), 'keyboard', 'M')
-RegisterCommand('engine', function()
-    local vehicle = GetVehicle()
-    if vehicle and IsPedInVehicle(PlayerPedId(), vehicle) then
-        ToggleEngine(vehicle)
-    end
+-- RegisterKeyMapping('engine', Lang:t("info.engine"), 'keyboard', 'M')
+-- RegisterCommand('engine', function()
+--     local vehicle = GetVehicle()
+--     if vehicle and IsPedInVehicle(PlayerPedId(), vehicle) then
+--         ToggleEngine(vehicle)
+--     end
+-- end)
+
+Citizen.CreateThread(function()
+  while true do
+     local playerPed = PlayerPedId()  
+      SetPedConfigFlag(playerPed, 241, true) -- PED_FLAG_DISABLE_STOPPING_VEHICLE_ENGINE
+      SetPedConfigFlag(playerPed, 429, true) -- PED_FLAG_DISABLE_STARTING_VEHICLE_ENGINE
+
+    Citizen.Wait(1000)
+  end
 end)
+
+RegisterCommand('engine', function()
+  local vehicle = GetVehiclePedIsIn(playerPed)
+
+  if not vehicle then
+    return
+  end
+
+  if GetPedInVehicleSeat(vehicle, -1) ~= playerPed then
+    return
+  end
+
+  if GetVehicleClass(vehicle) == 13 then
+    return
+  end
+ if HasKeys(QBCore.Functions.GetPlate(vehicle)) then
+    SetVehicleEngineOn(vehicle, not GetIsVehicleEngineRunning(vehicle), false, true)
+else 
+    return
+end
+end, false)
+
+RegisterKeyMapping('engine', "Engine", 'keyboard', Config.engineKey)
+
+
 
 -- AddEventHandler('onResourceStart', function(resourceName)
 --     if resourceName == GetCurrentResourceName() and QBCore.Functions.GetPlayerData() ~= {} then
@@ -59,9 +94,9 @@ end)
 -- end)
 
 -- Handles state right when the player selects their character and location.
-RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    GetKeys()
-end)
+-- RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+--     GetKeys()
+-- end)
 
 RegisterNetEvent('qb-vehiclekeys:client:AddKeys', function(plate)
     if Config.Debug then
@@ -136,25 +171,6 @@ RegisterNetEvent('weapons:client:DrawWeapon', function()
     Wait(2000)
     robKeyLoop()
 end)
-
--- RegisterNetEvent('lockpicks:UseLockpick', function()
-
---   --  LockpickDoor(isAdvanced)
-
---     local ped = PlayerPedId()
---     local entering = GetVehiclePedIsTryingToEnter(ped)
---     local coords = GetEntityCoords(ped)
---     local closestVehicle, distance = QBCore.Functions.GetClosestVehicle(coords)
---     if DoesEntityExist(closestVehicle) then
---         if not IsPedInAnyVehicle(Ped, false) then
---             if GetVehicleDoorLockStatus(closestVehicle) ~= 1 then
---                 local success = exports['qb-minigames']:Lockpick(5) -- number of tries
---                 if success then print('success') else print('fail') end
---             end
---         end
---     end
-
--- end)
 
 RegisterNetEvent('vehiclekeys:startlockpick', function()
     local ped = PlayerPedId()
